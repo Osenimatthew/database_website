@@ -26,42 +26,52 @@ async function saveOrUpdateCEOAndDomain(
 ) {
   try {
     showNotification(
-      "Please wait while the data is saving. only takes a few minute",
+      "Please wait while the data is saving. Only takes a few minutes.",
       "loading"
     );
-    const lines = inputText.split("\n");
 
-    for (let i = 0; i < lines.length; i += 2) {
-      const ceoLine = lines[i].trim();
-      const emailLine = lines[i + 1]?.trim();
+    const lines = inputText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line !== ""); // Trim and remove empty lines
 
-      if (!ceoLine || !emailLine || !emailLine.includes("@")) {
-        continue;
-      }
+    let ceoName = ""; // Initialize a variable to store the CEO name
 
-      const ceoNames = ceoLine; // The CEO names
-      const email = emailLine.split(" ").find((word) => word.includes("@")); // Extract email
-      const domain = email.split("@")[1]; // Extract domain
+    // Iterate through all lines
+    for (const line of lines) {
+      if (line.includes("@")) {
+        // Current line contains an email
+        const email = line.split(" ").find((word) => word.includes("@"));
+        const domain = email.split("@")[1]; // Extract domain
 
-      const docRef = doc(db, collectionName, domain);
-      const docSnap = await getDoc(docRef);
+        if (!ceoName) {
+          ceoName = "Unknown CEO"; // Default if no CEO name is found
+        }
 
-      if (docSnap.exists()) {
-        await setDoc(docRef, { ceoNames, domain }, { merge: true });
-        console.log(`Updated domain ${domain} with new names: ${ceoNames}`);
+        // Save to Firestore
+        const docRef = doc(db, collectionName, domain);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          await setDoc(docRef, { ceoNames: ceoName, domain }, { merge: true });
+        } else {
+          await setDoc(docRef, { ceoNames: ceoName, domain });
+        }
+
+        // Reset ceoName for the next pair
+        ceoName = "";
       } else {
-        await setDoc(docRef, { ceoNames, domain });
-        console.log(`Saved new domain ${domain} with names: ${ceoNames}`);
+        // Current line does not contain an email, so treat it as a CEO name
+        ceoName = line;
       }
     }
 
     showNotification(
-      "Data saved successfully! Thank you for Updating me",
+      "Data saved successfully! Thank you for updating me.",
       "success"
     );
     clearInputField();
   } catch (error) {
-    console.error("Error saving or updating data:", error);
     showNotification(`Error: ${error.message}`, "error");
   }
 }
@@ -100,4 +110,3 @@ document.getElementById("generateBtn").addEventListener("click", () => {
 
   saveOrUpdateCEOAndDomain(inputText);
 });
-
