@@ -44,11 +44,11 @@ body {
 }
 
 .input button {
-  display: inline-block;
+  display: block;
   position: absolute;
   margin-top: 13rem;
-  width: 10rem;
-  height: 4rem;
+  width: 12rem;
+  height: 6rem;
   border: 2px solid burlywood;
   border-radius: 1rem;
   color: #130f40;
@@ -80,7 +80,7 @@ body {
 }
 
 #notification.loading {
-    background-color: orange; /* Change to a color that indicates loading */
+    background-color: orange;
     color: white;
     font-size: 16px;
 }
@@ -89,3 +89,11 @@ body {
     display: block;
 }
 
+.warning {
+  margin-top: 5rem;
+  background-color: red;
+  font-size: 1.7rem;
+  height: 5rem;
+  text-align: center;
+  padding-top: 1.3rem;
+}
